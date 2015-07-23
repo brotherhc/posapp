@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util
+            http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- 缓存管理器 使用Ehcache实现 -->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManager" ref="ehCacheManager" />
+        <property name="cacheManagerConfigFile" value="classpath:ehcache-shiro.xml" />
+    </bean>
+
+
+    <bean id="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+
+    <!-- 凭证匹配器 -->
+    <bean id="credentialsMatcher" class="me.ethantu.posapp.commons.shiro.RetryLimitHashedCredentialsMatcher">
+        <constructor-arg ref="cacheManager" />
+        <property name="hashAlgorithmName" value="md5" />
+        <property name="hashIterations" value="2" />
+        <property name="storedCredentialsHexEncoded" value="true" />
+    </bean>
+
+    <!-- Realm实现 -->
+    <bean id="userRealm" class="me.ethantu.posapp.commons.shiro.UserRealm">
+        <property name="credentialsMatcher" ref="credentialsMatcher" />
+        <property name="cachingEnabled" value="true" />
+        <property name="authenticationCachingEnabled" value="true" />
+        <property name="authenticationCacheName" value="authenticationCache" />
+        <property name="authorizationCachingEnabled" value="true" />
+        <property name="authorizationCacheName" value="authorizationCache" />
+        <property name="cacheManager" ref="cacheManager" />
+    </bean>
+
+    <!-- 会话ID生成器 -->
+    <!--<bean id="sessionIdGenerator" class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator" />-->
+
+    <!-- 会话Cookie模板 -->
+    <!--<bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">-->
+        <!--<constructor-arg value="sid" />-->
+        <!--<property name="httpOnly" value="true" />-->
+        <!--<property name="maxAge" value="180000" />-->
+    <!--</bean>-->
+
+    <!-- 会话DAO -->
+    <!--<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">-->
+        <!--<property name="activeSessionsCacheName" value="shiro-activeSessionCache" />-->
+        <!--<property name="sessionIdGenerator" ref="sessionIdGenerator" />-->
+    <!--</bean>-->
+
+    <!-- 会话验证调度器 -->
+    <!--<bean id="sessionExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" destroy-method="shutdown">-->
+        <!--<property name="corePoolSize" value="1" />-->
+        <!--<property name="maxPoolSize" value="2" />-->
+        <!--<property name="queueCapacity" value="60" />-->
+    <!--</bean>-->
+
+    <!--<bean id="sessionScheduler" class="org.springframework.scheduling.concurrent.ConcurrentTaskScheduler">-->
+        <!--<property name="concurrentExecutor" ref="sessionExecutor" />-->
+    <!--</bean>-->
+
+    <!--<bean id="sessionValidationScheduler" class="me.ethantu.unlock.common.shiro.SpringSessionValidationScheduler">-->
+        <!--<property name="sessionValidationInterval" value="10000" />-->
+        <!--<property name="sessionManager" ref="sessionManager" />-->
+        <!--<property name="scheduler" ref="sessionScheduler" />-->
+
+    <!--</bean>-->
+
+    <!-- 会话管理器 -->
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.ServletContainerSessionManager">
+        <!--<property name="globalSessionTimeout" value="1800000" />-->
+        <!--<property name="deleteInvalidSessions" value="true" />-->
+        <!--<property name="sessionValidationSchedulerEnabled" value="true" />-->
+        <!--<property name="sessionValidationScheduler" ref="sessionValidationScheduler" />-->
+        <!--<property name="sessionDAO" ref="sessionDAO" />-->
+        <!--<property name="sessionIdCookieEnabled" value="true" />-->
+        <!--<property name="sessionIdCookie" ref="sessionIdCookie" />-->
+        <!--<property name="cacheManager" ref="cacheManager"  />-->
+    </bean>
+
+     <!--安全管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager" destroy-method="destroy">
+        <property name="realm" ref="userRealm" />
+        <property name="sessionManager" ref="sessionManager" />
+        <property name="cacheManager" ref="cacheManager" />
+    </bean>
+
+     <!--相当于调用SecurityUtils.setSecurityManager(securityManager) -->
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="org.apache.shiro.SecurityUtils.setSecurityManager" />
+        <property name="arguments" ref="securityManager" />
+    </bean>
+
+    <!-- 基于Form表单的身份验证过滤器 -->
+    <bean id="loginAuthenticationFilter" class="me.ethantu.posapp.commons.shiro.LoginAuthenticationFilter">
+        <property name="usernameParam" value="username" />
+        <property name="passwordParam" value="password" />
+        <property name="loginUrl" value="/login" />
+    </bean>
+
+    <bean id="apiAuthenticationFilter" class="me.ethantu.posapp.commons.shiro.LoginAuthenticationFilter">
+        <property name="usernameParam" value="username" />
+        <property name="passwordParam" value="password" />
+        <property name="loginUrl" value="/api/login" />
+    </bean>
+
+    <bean id="verificationCodeValidateFilter" class="me.ethantu.posapp.commons.shiro.VerificationCodeValidateFilter">
+    </bean>
+
+    <!-- Shiro的Web过滤器 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean" >
+        <property name="securityManager" ref="securityManager" />
+        <property name="loginUrl" value="/" />
+        <property name="unauthorizedUrl" value="/unauthorized" />
+        <property name="filters">
+            <util:map>
+                <entry key="authc" value-ref="loginAuthenticationFilter" />
+                <entry key="apiAuthc" value-ref="apiAuthenticationFilter" />
+                <entry key="verificationCodeValidate" value-ref="verificationCodeValidateFilter" />
+            </util:map>
+        </property>
+        <property name="filterChainDefinitions">
+            <value>
+                /resources/** = anon
+                <!--/index.jsp = anon-->
+                <!--/unauthorized = anon-->
+                /login = verificationCodeValidate,authc
+
+                /user/list = perms["user:list:*"]
+                /user/create = perms["user:create:*"]
+                /user/edit/* = perms["user:edit:*"]
+                /user/show/* = perms["user:show:*"]
+                /user/delete/* = roles["administrator"]
+
+                /role/** = roles["administrator"]
+                /permission/** = roles["administrator"]
+                /voucher/** = roles["administrator"]
+
+                /dashboard/** = perms["dashboard:*:*"]
+
+
+                <!-- api -->
+                /api/login = apiAuthc
+                /api/voucher =  perms["api:*:*"]
+                /** = anon
+
+            </value>
+        </property>
+    </bean>
+
+    <!-- Shiro生命周期处理器-->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+</beans>

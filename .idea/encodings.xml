@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" useUTFGuessing="false" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/config.properties" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/freemarker.properties" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/logback.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/messages.properties" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/spring-mvc.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/spring-persistence.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/spring.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/webapp" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>
+

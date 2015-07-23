@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass"  value="org.hibernate.validator.HibernateValidator" />
+        <property name="validationMessageSource" ref="messageSource" />
+    </bean>
+
+    <mvc:annotation-driven validator="validator">
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"></bean>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg index="0">
+                    <bean class="java.nio.charset.Charset"
+                          factory-method="forName">
+                        <constructor-arg value="UTF-8"/>
+                    </bean>
+                </constructor-arg>
+                <!--<property name="supportedMediaTypes">-->
+                    <!--<list>-->
+                        <!--<value>text/plain;charset=UTF-8</value>-->
+                    <!--</list>-->
+                <!--</property>-->
+            </bean>
+            <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value><!-- For sb IE download -->
+                    </list>
+                </property>
+                <property name="features">
+                    <list>
+                        <value>WriteMapNullValue</value>
+                        <value>WriteDateUseDateFormat</value>
+                        <!--<value>QuoteFieldNames</value>-->
+                    </list>
+                </property>
+            </bean>
+            <bean class="org.springframework.http.converter.ResourceHttpMessageConverter"></bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <context:component-scan base-package="me.ethantu.posapp.interfaces">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+        <!--<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" />-->
+        <!--<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository" />-->
+        <!--<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Component" />-->
+    </context:component-scan>
+
+    <!--<mvc:resources mapping="/favicon.ico" location="/resources/images/favicon.ico" order="0"/>-->
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+
+    <!--<bean id="multipartResolver"-->
+          <!--class="org.springframework.web.multipart.commons.CommonsMultipartResolver"-->
+          <!--p:defaultEncoding="utf-8">-->
+         <!--设置上传文件的最大尺寸为2MB -->
+        <!--<property name="maxUploadSize">-->
+            <!--<value>20480000</value>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!-- FreeMarker视图解析 在这里配置后缀名ftl和视图解析器。。 -->
+    <bean id="freemarkerConfiguration"
+          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="location" value="classpath:freemarker.properties" />
+    </bean>
+
+    <bean id="freemarkerConfig"
+          class="me.ethantu.posapp.commons.freemarker.support.spring.FreeMarkerConfigurerExtension">
+        <property name="freemarkerSettings" ref="freemarkerConfiguration" />
+        <property name="templateLoaderPath" value="/WEB-INF/views/" />
+        <property name="defaultEncoding" value="UTF-8" />
+        <!--<property name="freemarkerVariables">-->
+            <!--<map>-->
+                <!--<entry key="xml_escape" value-ref="fmXmlEscape" />-->
+            <!--</map>-->
+        <!--</property>-->
+    </bean>
+
+    <!--<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />-->
+
+    <bean id="freemarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView" />
+        <property name="contentType" value="text/html; charset=UTF-8" />
+        <property name="cache" value="true" />
+        <property name="prefix" value="" />
+        <property name="suffix" value=".ftl" />
+        <property name="order" value="0" />
+        <!--<property name="exposeSpringMacroHelpers" value="false" /> &lt;!&ndash; imported in freemarker.properties &ndash;&gt;-->
+        <property name="requestContextAttribute" value="request" />
+    </bean>
+
+    <!-- 全局异常 -->
+    <!--<bean class="net.icecn.takeaway.exception.ExceptionHandler" />-->
+</beans>
+

@@ -1,0 +1,66 @@
+table{
+    width: 750px;
+    margin: 0 auto;
+}
+#table{
+    width: 750px;
+    margin: 0 auto;
+    border-bottom: 1px solid #d6d6d6;
+    border-radius: 5px;
+}
+thead{
+    color: #DA8028;
+    font-size: 16px;
+    text-align: center;
+}
+tr{
+    height: 50px;
+    border-bottom: 1px solid #d6d6d6;
+}
+td{
+    text-align: center;
+    width: 175px;
+}
+
+.tips-h2{
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    font-size: 18px;
+    margin:0 auto;
+}
+.tips-box{
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+.tips-box-l{
+    width: 800px;
+    margin:20px auto;
+    text-align: center;
+}
+.tips-box-2{
+    font-size: 16px;
+    width: 800px;
+    margin: 30px auto;
+    text-align: left;
+}
+#button{
+    width: 270px;
+    margin: 0px auto;
+}
+#but{
+    float: left;
+    height: 35px;
+    color: #ffffff;
+    width: 110px;
+    padding: 0px;
+}
+#but a{
+    background-color: #0088cc;
+    margin: 20px;
+    color: #ffffff;
+    padding: 5px 15px;
+    font-size: 20px;
+    border-radius: 5px;
+    text-decoration:none;
+}

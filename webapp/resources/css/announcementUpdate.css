@@ -1,0 +1,33 @@
+form{
+    background-color: #ffffff;
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+}
+textarea{
+    border: 1px solid #e3e3e3;
+    border-radius: 2px;
+    width: 400px;
+    height: 180px;
+}
+ul {
+    margin-top: 30px;
+    list-style-type: none;
+    margin-left: 250px;
+    margin-right: 219px;
+    *margin-right: 0px;
+    padding: 0px;
+}
+ul li {
+    margin-bottom: 20px;
+    *margin-left: -45px;
+}
+.btn{
+    width: 130px;
+    height: 35px;
+    background: url(../images/yellowbtn.png) no-repeat;
+    color: White;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 60px;
+    *margin-left: 0px;
+}
